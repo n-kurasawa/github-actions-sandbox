@@ -18,6 +18,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
           script: |
             const sha = context.sha
             const repo = context.repo
@@ -28,16 +29,16 @@ jobs:
               ref: `refs/tags/${tag_name}`,
               sha: sha
             })
-            core.setOutput('tag_name', tag_name);
+            return tag_name;
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.create_tag.outputs.tag_name }}
-          release_name: Release ${{ steps.create_tag.outputs.tag_name }}
+          tag_name: ${{ steps.create_tag.outputs.result }}
+          release_name: Release ${{ steps.create_tag.outputs.result }}
           body: |
             Changes in this Release
             - Merged PR into main branch
