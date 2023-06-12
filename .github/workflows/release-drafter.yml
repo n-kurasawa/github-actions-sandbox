@@ -18,8 +18,8 @@ jobs:
       - name: Generate CalVer version
         id: calver
         run: |
-          export VERSION="$(date "+%Y%m%d_%H%M%S")"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          export VERSION="$(TZ=Asia/Tokyo date "+%Y%m%d_%H%M%S")"
+          echo "version=release-${VERSION}" >> $GITHUB_OUTPUT
       - uses: release-drafter/release-drafter@v5
         with:
           tag: ${{ steps.calver.outputs.version }}
