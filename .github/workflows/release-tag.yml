@@ -22,7 +22,7 @@ jobs:
           script: |
             const sha = context.sha
             const repo = context.repo
-            const tag_name = `release-${new Date().toLocaleString({ timeZone: 'Asia/Tokyo' }).toISOString().replaceAll(":", "-")}`
+            const tag_name = `release-${new Date().toISOString()}`
             await github.rest.git.createRef({
               ...repo,
               ref: `refs/tags/${tag_name}`,
