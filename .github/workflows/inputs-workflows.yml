@@ -22,3 +22,6 @@ jobs:
             echo "The selected tag ($REF_TAG) does not match the input tag ($TAG_NAME). Exiting..."
             exit 1
           fi
+      - name: Next step
+        run: |
+          echo "Success!"
