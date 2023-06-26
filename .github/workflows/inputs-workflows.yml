@@ -1,33 +1,24 @@
-name: input workflow
+name: Verify tag
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: "Log level"
-        required: true
-        default: "warning"
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-      tags:
-        description: "Test scenario tags"
-        required: false
-        type: boolean
-      confirm_tag:
-        description: "Confirm tag"
+      release_tag:
+        description: "Release tag to check"
         required: true
 
 jobs:
-  log-the-inputs:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "Log level: $LEVEL"
-          echo "Tags: $TAGS"
-          echo "Environment: $ENVIRONMENT"
-        env:
-          LEVEL: ${{ inputs.logLevel }}
-          TAGS: ${{ inputs.tags }}
-          ENVIRONMENT: ${{ inputs.environment }}
+      - name: Verify tag
+        run: |
+          TAG_NAME=${{ github.event.inputs.release_tag }}
+          REF_NAME=${{ github.ref }}
+          REF_TAG=${REF_NAME/refs\/tags\//}
+
+          if [[ "$TAG_NAME" == "$REF_TAG" ]]; then
+            echo "The selected tag ($REF_TAG) matches the input tag ($TAG_NAME)."
+          else
+            echo "The selected tag ($REF_TAG) does not match the input tag ($TAG_NAME). Exiting..."
+            exit 1
+          fi
