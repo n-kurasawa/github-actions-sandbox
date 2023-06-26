@@ -5,12 +5,16 @@ on:
       release_tag:
         description: "Release tag to check"
         required: true
+  push:
+    branches:
+      - main
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - name: Verify tag
+        if: github.event_name == 'workflow_dispatch'
         run: |
           TAG_NAME=${{ github.event.inputs.release_tag }}
           REF_NAME=${{ github.ref }}
