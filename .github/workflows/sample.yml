@@ -1,0 +1,44 @@
+name: Sample
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "確認のため、リリースするタグ名を入力してください。"
+        required: true
+      confirmation:
+        description: "確認のため、「本番環境にリリースします」と入力してください。"
+        required: true
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 手動 (workflow_dispatch) で実行した場合、入力したタグ名と現在のタグ名が一致するかを確認する
+      # 意図していないタグでリリースされることを防ぐため
+      - name: Verify tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          TAG_NAME=${{ github.event.inputs.release_tag }}
+          REF_NAME=${{ github.ref }}
+          REF_TAG=${REF_NAME/refs\/tags\//}
+
+          if [[ "$TAG_NAME" == "$REF_TAG" ]]; then
+            echo "The selected tag ($REF_TAG) matches the input tag ($TAG_NAME)."
+          else
+            echo "The selected tag ($REF_TAG) does not match the input tag ($TAG_NAME). Exiting..."
+            exit 1
+          fi
+      - name: Check confirmation
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "本番環境にリリースします" ]; then
+            echo "Confirmation phrase does not match. Cancelling workflow."
+            exit 1
+          fi
+      - name: Success
+        run: |
+          echo "Success!"
